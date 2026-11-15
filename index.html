@@ -376,8 +376,8 @@ src="https://www.facebook.com/tr?id=1878608889840802&ev=PageView&noscript=1"
               <div class="otp-panel" id="gla-otp-panel" hidden>
                 <p class="otp-msg" id="gla-otp-msg" aria-live="polite"></p>
                 <div class="otp-row">
-                  <label for="gla-otp" class="sr-only">6-digit OTP</label>
-                  <input class="field otp-input" id="gla-otp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="······" aria-label="6-digit OTP">
+                  <label for="gla-otp" class="sr-only">OTP</label>
+                  <input class="field otp-input" id="gla-otp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Enter OTP" aria-label="OTP">
                   <button type="button" class="otp-verify" id="gla-otp-verify">Verify</button>
                 </div>
                 <div class="otp-meta">
@@ -972,6 +972,8 @@ var configuration = {
   var st={token:null,verifiedToken:null,verifiedMobile:null,busy:false,cool:0,tick:null,touched:{},pendingSubmit:false};
   /* Paste the Google Apps Script Web App URL here (see apps-script/README) */
   var LEAD_ENDPOINT='https://script.google.com/macros/s/AKfycbzWJ7TLb4Dtc-HSKLEpaxBw5RybfZsYwYzFYk7r03fZo8zhPUn-WLEADSERhjX1IJwe/exec';
+  /* Must match 'OTP length' in the MSG91 widget settings (MSG91 default = 4). If you change it there, change it here. */
+  var OTP_LEN=4;
   var NAME_RE=/^\p{L}[\p{L}\p{M} .'’-]{1,59}$/u;
 
   /* ---------- syntax rules ---------- */
@@ -1070,7 +1072,7 @@ var configuration = {
   }
   function verifyOtp(){
     var code=ui.otp.value.trim();
-    if(!/^\d{6}$/.test(code)){setMsg('Enter the 6-digit OTP.',true);ui.otp.focus();return;}
+    if(!/^\d{4,6}$/.test(code)){setMsg('Enter the OTP sent to your mobile.',true);ui.otp.focus();return;}
     if(!st.token){setMsg('Please request an OTP first.',true);return;}
     ui.verify.disabled=true; ui.verify.textContent='Checking…';
     wVerify(code).then(function(r){ return r.ok ? {ok:true,verifiedToken:r.token} : r; }).then(function(j){
@@ -1105,7 +1107,7 @@ var configuration = {
   ui.verify.addEventListener('click',verifyOtp);
   ui.otp.addEventListener('input',function(){
     ui.otp.value=ui.otp.value.replace(/\D/g,'').slice(0,6); setMsg(ui.msg.textContent.replace(/^$/,''),false);
-    if(ui.otp.value.length===6) verifyOtp();
+    if(ui.otp.value.length===OTP_LEN) verifyOtp();
   });
   ui.otp.addEventListener('keydown',function(e){ if(e.key==='Enter'){e.preventDefault();verifyOtp();} });
   ui.change.addEventListener('click',function(){closePanel();st.token=null;el.mobile.focus();el.mobile.select();});
