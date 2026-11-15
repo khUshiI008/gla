@@ -153,6 +153,129 @@
     .bottom-proof { gap: 12px 18px; }
   }
 </style>
+<style id="gla-form-upgrade">
+/* ===== Lead form: stronger presence, validation + OTP states ===== */
+.floating-form{position:relative;padding:30px 24px 22px;background:#fff;border-radius:20px;overflow:visible;
+  box-shadow:0 36px 80px -12px rgba(0,0,0,.55),0 0 0 1px rgba(244,200,74,.7),0 0 0 7px rgba(244,200,74,.16);
+  animation:glaFormPulse 3.4s ease-in-out infinite}
+.floating-form::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;border-radius:20px 20px 0 0;background:linear-gradient(90deg,#0b5938,#f4c84a 50%,#0b5938)}
+@keyframes glaFormPulse{0%,100%{box-shadow:0 36px 80px -12px rgba(0,0,0,.55),0 0 0 1px rgba(244,200,74,.7),0 0 0 7px rgba(244,200,74,.16)}50%{box-shadow:0 36px 80px -12px rgba(0,0,0,.55),0 0 0 1px rgba(244,200,74,.9),0 0 0 13px rgba(244,200,74,.05)}}
+.form-badge{position:absolute;top:-14px;left:22px;display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:linear-gradient(105deg,#f4c84a,#ffe08a);color:#14291e;font-size:10px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;box-shadow:0 8px 18px rgba(0,0,0,.28);z-index:2}
+.form-badge i{width:7px;height:7px;border-radius:50%;background:#1b9a5b;box-shadow:0 0 0 0 rgba(27,154,91,.6);animation:glaDot 1.8s infinite}
+@keyframes glaDot{70%{box-shadow:0 0 0 7px rgba(27,154,91,0)}100%{box-shadow:0 0 0 0 rgba(27,154,91,0)}}
+.floating-form .form-kicker{color:#1d7a52}
+.floating-form h2{margin:8px 0 7px;font-size:27px;font-weight:850;letter-spacing:-.045em;color:#102b1f}
+.floating-form .form-intro{margin:0 0 18px;font-size:12.5px}
+
+.fgroup{position:relative;margin-bottom:11px;min-width:0}
+.finput{position:relative;display:flex;align-items:center}
+.floating-form .field{height:48px;margin:0;padding:0 14px;border:1.5px solid #cbd6ce;border-radius:11px;background:#fff;color:#14291e;font-size:14px;transition:border-color .15s,box-shadow .15s,background .15s}
+.floating-form .field::placeholder{color:#7b8a80}
+.floating-form .field:hover{border-color:#9db3a4}
+.floating-form .field:focus{outline:0;border-color:#0b5938;box-shadow:0 0 0 4px rgba(244,200,74,.42)}
+.finput .field{padding-left:42px}
+.ficon{position:absolute;left:14px;display:grid;place-items:center;color:#6c7d72;pointer-events:none}
+.finput:focus-within .ficon{color:#0b5938}
+.finput-mobile .cc{position:absolute;left:40px;font-size:14px;font-weight:800;color:#14291e;padding-right:9px;border-right:1px solid #d3ddd6;line-height:22px}
+.finput-mobile .field{padding-left:84px;padding-right:104px}
+select.field{appearance:none;-webkit-appearance:none;padding-right:34px;text-overflow:ellipsis;cursor:pointer;
+  background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23567a64' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 13px center}
+select.field:invalid{color:#7b8a80}
+.fgroup.is-valid .field{border-color:#2f9e62}
+.fgroup.is-invalid .field{border-color:#d33a3a;background-color:#fff8f8}
+.fgroup.is-invalid .field:focus{box-shadow:0 0 0 4px rgba(211,58,58,.18)}
+.ferr{display:none;margin:5px 3px 0;color:#c02929;font-size:11.5px;line-height:1.35;font-weight:600}
+.fgroup.is-invalid>.ferr{display:block}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+
+.otp-send,.otp-verify{border:0;border-radius:8px;background:#0b5938;color:#fff;font:inherit;font-weight:800;cursor:pointer;transition:background .15s,opacity .15s,transform .15s}
+.otp-send{position:absolute;right:6px;height:36px;padding:0 13px;font-size:12px}
+.otp-send:hover:not(:disabled),.otp-verify:hover:not(:disabled){background:#0e6e46}
+.otp-send:disabled,.otp-verify:disabled{opacity:.42;cursor:not-allowed}
+.otp-verified{position:absolute;right:10px;display:inline-flex;align-items:center;gap:5px;color:#1b7a4a;font-size:12px;font-weight:850}
+.otp-verified[hidden],.otp-panel[hidden],.form-alert[hidden],.form-success[hidden]{display:none!important}
+.linklike{border:0;background:none;padding:0;color:#0b5938;font:inherit;font-size:11.5px;font-weight:750;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.linklike:disabled{color:#7b8a80;text-decoration:none;cursor:default}
+.otp-verified .linklike{font-size:11px;margin-left:3px}
+.fgroup.is-verified .field{border-color:#2f9e62;background:#f5fbf7}
+
+.otp-panel{margin-top:9px;padding:12px;border:1.5px dashed #9cc9ad;border-radius:12px;background:#f3faf6;animation:glaSlide .25s ease}
+@keyframes glaSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.otp-msg{margin:0 0 9px;color:#27523b;font-size:12px;line-height:1.45;font-weight:600}
+.otp-msg.is-error{color:#c02929}
+.otp-row{display:grid;grid-template-columns:1fr auto;gap:8px}
+.floating-form .otp-input{padding:0 0 0 .6em;text-align:center;letter-spacing:.6em;font-size:19px;font-weight:800;font-variant-numeric:tabular-nums}
+.otp-verify{height:48px;padding:0 20px;font-size:13px}
+.otp-meta{display:flex;justify-content:space-between;gap:10px;margin-top:9px}
+
+.hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0}
+.form-alert{margin:2px 0 10px;padding:10px 12px;border-radius:10px;background:#fff1f1;border:1px solid #f2c2c2;color:#a92424;font-size:12px;font-weight:650;line-height:1.4}
+
+.floating-form .form-submit{position:relative;overflow:hidden;gap:10px;min-height:56px;margin-top:4px;border-radius:12px;font-size:15.5px;font-weight:900;letter-spacing:-.01em;color:#14291e;
+  background:linear-gradient(100deg,#f4c84a,#ffe08a 55%,#f4c84a);box-shadow:0 14px 28px -8px rgba(214,158,16,.75),inset 0 -3px 0 rgba(0,0,0,.08);transition:transform .15s,box-shadow .15s,filter .15s}
+.floating-form .form-submit::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.65),transparent);transform:skewX(-20deg);animation:glaShine 3.6s ease-in-out infinite}
+@keyframes glaShine{0%,55%{left:-60%}100%{left:130%}}
+.floating-form .form-submit:hover{transform:translateY(-2px);box-shadow:0 18px 34px -8px rgba(214,158,16,.85),inset 0 -3px 0 rgba(0,0,0,.08)}
+.floating-form .form-submit:active{transform:translateY(1px)}
+.floating-form .form-submit .arr{transition:transform .2s;font-size:18px}
+.floating-form .form-submit:hover .arr{transform:translateX(5px)}
+.floating-form .form-submit.is-loading{pointer-events:none;filter:saturate(.7)}
+.floating-form .form-submit.is-loading .arr{width:18px;height:18px;border:3px solid rgba(20,41,30,.25);border-top-color:#14291e;border-radius:50%;font-size:0;animation:glaSpin .7s linear infinite}
+@keyframes glaSpin{to{transform:rotate(360deg)}}
+.floating-form .form-assurance{margin-top:14px;font-size:10px}
+.form-consent{margin:11px 0 0;color:#6b7a70;font-size:10px;line-height:1.5;text-align:center}
+
+.form-success{padding:34px 8px 22px;text-align:center}
+.success-tick{width:68px;height:68px;margin:0 auto 14px;border-radius:50%;display:grid;place-items:center;color:#fff;background:linear-gradient(145deg,#1fa862,#0b5938);box-shadow:0 12px 26px -6px rgba(11,89,56,.6);animation:glaPop .5s cubic-bezier(.2,1.4,.4,1)}
+@keyframes glaPop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+.form-success h3{margin:0 0 8px;color:#102b1f;font-size:24px;letter-spacing:-.04em}
+.form-success p{margin:0 auto;max-width:300px;color:#4d5d53;font-size:13.5px;line-height:1.55}
+.floating-form.is-done{animation:none}
+.floating-form.is-done .form-body{display:none}
+.floating-form.shake{animation:glaShake .4s}
+@keyframes glaShake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+
+/* Desktop: form is fully visible (no inner scrolling) with the cashback card as a compact strip underneath */
+@media (min-width:801px){
+  .hero-visual{display:flex;flex-direction:column;gap:22px}
+  .hero-visual .floating-form{order:-1}
+  .floating-form{position:relative;inset:auto;right:auto;top:auto;transform:none;width:100%;max-width:450px;max-height:none;overflow:visible;margin:16px 0 0 auto}
+  .floating-form.shake{animation:glaShake .4s}
+  .hero-visual .photo-frame{min-height:0;width:100%;max-width:450px;margin-left:auto;border-radius:16px;padding:16px 20px}
+  .hero-visual .money-visual-content{max-width:none;display:grid;grid-template-columns:1fr auto;grid-template-areas:"eb eb" "of cb" "of sl" "fe fe" "fo fo";column-gap:16px}
+  .hero-visual .money-eyebrow{grid-area:eb;margin:0 0 8px}
+  .hero-visual .money-offer{grid-area:of;margin:0;align-self:center}
+  .hero-visual .money-cashback{grid-area:cb;text-align:right;font-size:40px}
+  .hero-visual .money-subline{grid-area:sl;margin:4px 0 0;text-align:right}
+  .hero-visual .money-fees{grid-area:fe;margin-top:12px;padding-top:12px}
+  .hero-visual .money-footnote{grid-area:fo;margin:8px 0 0}
+}
+@media (max-width:800px){.floating-form{scroll-margin-top:16px}}
+@media (max-width:560px){
+  .floating-form{padding:30px 18px 20px}
+  .frow{grid-template-columns:1fr}
+  .floating-form h2{font-size:25px}
+}
+@media (prefers-reduced-motion:reduce){.floating-form,.form-badge i,.floating-form .form-submit::after,.otp-panel,.success-tick{animation:none!important}}
+</style>
+
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1878608889840802');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1878608889840802&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
 <section class="gla-hero" aria-labelledby="gla-hero-title">
@@ -223,63 +346,121 @@
           </div>
         </div>
 
-        <form class="floating-form" id="gla-lead-form" action="#" method="post">
-          <div class="form-kicker">Take the next step</div>
-          <h2>Get Program Guidance</h2>
-          <p class="form-intro">Get information about Online MBA and MCA, eligibility, fee options and admissions.</p>
+        <form class="floating-form" id="gla-lead-form" action="#" method="post" novalidate>
+          <span class="form-badge"><i></i>Free counselling · takes 1 minute</span>
+          <div class="form-body">
+            <div class="form-kicker">Take the next step</div>
+            <h2>Get Program Guidance</h2>
+            <p class="form-intro">Get information about Online MBA and MCA, eligibility, fee options and admissions.</p>
 
-          <label for="gla-name" class="sr-only">Full name</label>
-          <input class="field" id="gla-name" name="name" type="text" placeholder="Full Name" autocomplete="name" required>
+            <div class="fgroup" data-field="name">
+              <label for="gla-name" class="sr-only">Full name</label>
+              <div class="finput">
+                <span class="ficon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>
+                <input class="field" id="gla-name" name="name" type="text" placeholder="Full Name" autocomplete="name" maxlength="60" aria-describedby="err-name" required>
+              </div>
+              <p class="ferr" id="err-name" role="alert"></p>
+            </div>
 
-          <label for="gla-mobile" class="sr-only">Mobile number</label>
-          <input class="field" id="gla-mobile" name="mobile" type="tel" placeholder="Mobile Number" autocomplete="tel" inputmode="tel" pattern="[0-9+() -]{8,18}" required>
+            <div class="fgroup" data-field="mobile">
+              <label for="gla-mobile" class="sr-only">Mobile number</label>
+              <div class="finput finput-mobile">
+                <span class="ficon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/></svg></span>
+                <span class="cc" aria-hidden="true">+91</span>
+                <input class="field" id="gla-mobile" name="mobile" type="tel" inputmode="numeric" placeholder="Mobile number" autocomplete="tel-national" aria-describedby="err-mobile" required>
+                <button type="button" class="otp-send" id="gla-otp-send" disabled>Send OTP</button>
+                <span class="otp-verified" id="gla-otp-verified" hidden><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Verified <button type="button" class="linklike" id="gla-otp-edit">Change</button></span>
+              </div>
+              <p class="ferr" id="err-mobile" role="alert"></p>
 
-          <label for="gla-program" class="sr-only">Program of interest</label>
-          <select class="field" id="gla-program" name="program" required>
-            <option value="" selected disabled>Which program interests you?</option>
-            <option value="online-mba">Online MBA</option>
-            <option value="online-mca">Online MCA</option>
-            <option value="undecided">Not sure yet</option>
-          </select>
+              <div class="otp-panel" id="gla-otp-panel" hidden>
+                <p class="otp-msg" id="gla-otp-msg" aria-live="polite"></p>
+                <div class="otp-row">
+                  <label for="gla-otp" class="sr-only">6-digit OTP</label>
+                  <input class="field otp-input" id="gla-otp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="······" aria-label="6-digit OTP">
+                  <button type="button" class="otp-verify" id="gla-otp-verify">Verify</button>
+                </div>
+                <div class="otp-meta">
+                  <button type="button" class="linklike" id="gla-otp-resend" disabled>Resend OTP in <b id="gla-otp-timer">30</b>s</button>
+                  <button type="button" class="linklike" id="gla-otp-change">Change number</button>
+                </div>
+              </div>
+            </div>
 
-          <label for="gla-qualification" class="sr-only">Highest qualification</label>
-          <select class="field" id="gla-qualification" name="qualification" required>
-            <option value="" selected disabled>Highest qualification</option>
-            <option value="bachelors">Bachelor’s degree</option>
-            <option value="masters">Master’s degree</option>
-            <option value="other">Other qualification</option>
-            <option value="not-completed">Graduation not completed</option>
-          </select>
+            <div class="fgroup" data-field="program">
+              <label for="gla-program" class="sr-only">Program of interest</label>
+              <select class="field" id="gla-program" name="program" aria-describedby="err-program" required>
+                <option value="" selected disabled>Which program interests you?</option>
+                <option value="online-mba">Online MBA</option>
+                <option value="online-mca">Online MCA</option>
+                <option value="undecided">Not sure yet</option>
+              </select>
+              <p class="ferr" id="err-program" role="alert"></p>
+            </div>
 
-          <label for="gla-experience" class="sr-only">Work experience</label>
-          <select class="field" id="gla-experience" name="work_experience" required>
-            <option value="" selected disabled>Work experience</option>
-            <option value="not-working">Not currently working</option>
-            <option value="under-2">Less than 2 years</option>
-            <option value="2-5">2–5 years</option>
-            <option value="6-10">6–10 years</option>
-            <option value="10-plus">10+ years</option>
-          </select>
+            <div class="frow">
+              <div class="fgroup" data-field="qualification">
+                <label for="gla-qualification" class="sr-only">Highest qualification</label>
+                <select class="field" id="gla-qualification" name="qualification" aria-describedby="err-qualification" required>
+                  <option value="" selected disabled>Highest qualification</option>
+                  <option value="bachelors">Bachelor’s degree</option>
+                  <option value="masters">Master’s degree</option>
+                  <option value="other">Other qualification</option>
+                  <option value="not-completed">Graduation not completed</option>
+                </select>
+                <p class="ferr" id="err-qualification" role="alert"></p>
+              </div>
+              <div class="fgroup" data-field="work_experience">
+                <label for="gla-experience" class="sr-only">Work experience</label>
+                <select class="field" id="gla-experience" name="work_experience" aria-describedby="err-work_experience" required>
+                  <option value="" selected disabled>Work experience</option>
+                  <option value="not-working">Not currently working</option>
+                  <option value="under-2">Less than 2 years</option>
+                  <option value="2-5">2–5 years</option>
+                  <option value="6-10">6–10 years</option>
+                  <option value="10-plus">10+ years</option>
+                </select>
+                <p class="ferr" id="err-work_experience" role="alert"></p>
+              </div>
+            </div>
 
-          <label for="gla-timeline" class="sr-only">When do you plan to enrol?</label>
-          <select class="field" id="gla-timeline" name="enrolment_timeline" required>
-            <option value="" selected disabled>When do you plan to enrol?</option>
-            <option value="immediately">As soon as possible</option>
-            <option value="30-days">Within 30 days</option>
-            <option value="3-months">Within 1–3 months</option>
-            <option value="researching">Just researching</option>
-          </select>
+            <div class="frow">
+              <div class="fgroup" data-field="enrolment_timeline">
+                <label for="gla-timeline" class="sr-only">When do you plan to enrol?</label>
+                <select class="field" id="gla-timeline" name="enrolment_timeline" aria-describedby="err-enrolment_timeline" required>
+                  <option value="" selected disabled>When will you enrol?</option>
+                  <option value="immediately">As soon as possible</option>
+                  <option value="30-days">Within 30 days</option>
+                  <option value="3-months">Within 1–3 months</option>
+                  <option value="researching">Just researching</option>
+                </select>
+                <p class="ferr" id="err-enrolment_timeline" role="alert"></p>
+              </div>
+              <div class="fgroup" data-field="payment_preference">
+                <label for="gla-budget" class="sr-only">Fee/payment preference</label>
+                <select class="field" id="gla-budget" name="payment_preference" aria-describedby="err-payment_preference" required>
+                  <option value="" selected disabled>Payment preference</option>
+                  <option value="emi">EMI / instalments</option>
+                  <option value="full-payment">Full payment</option>
+                  <option value="compare">Need to compare options</option>
+                </select>
+                <p class="ferr" id="err-payment_preference" role="alert"></p>
+              </div>
+            </div>
 
-          <label for="gla-budget" class="sr-only">Fee/payment preference</label>
-          <select class="field" id="gla-budget" name="payment_preference" required>
-            <option value="" selected disabled>Preferred payment option</option>
-            <option value="emi">EMI / instalments</option>
-            <option value="full-payment">Full payment</option>
-            <option value="compare">Need to compare options</option>
-          </select>
+            <input type="text" name="company_website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
 
-          <button class="form-submit" type="submit">Check My Eligibility <span aria-hidden="true">→</span></button>
-          <div class="form-assurance"><span>Quick response</span><span>No obligation</span><span>Secure enquiry</span></div>
+            <p class="form-alert" id="gla-form-alert" role="alert" hidden></p>
+            <button class="form-submit" id="gla-submit" type="submit"><span class="lbl">Check My Eligibility</span> <span class="arr" aria-hidden="true">→</span></button>
+            <div class="form-assurance"><span>Quick response</span><span>No obligation</span><span>OTP-verified &amp; secure</span></div>
+            <p class="form-consent">By submitting, you agree to be contacted by a counsellor on this number about your enquiry. The OTP is used only to verify your number.</p>
+          </div>
+
+          <div class="form-success" id="gla-form-success" role="status" hidden>
+            <div class="success-tick" aria-hidden="true"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+            <h3 id="gla-success-title">Thank you!</h3>
+            <p id="gla-success-text">Your enquiry has been received. A counsellor will contact you on your verified number.</p>
+          </div>
         </form>
       </div>
     </div>
@@ -748,7 +929,7 @@
     <div class="gla-footer-brand"><div class="gla-footer-logo">GLA <span>ONLINE</span></div><p>Explore online postgraduate learning options designed to help you plan your next academic and professional step.</p></div>
     <div class="gla-footer-col"><h3>Programmes</h3><a href="#career-ladder-title">Online MBA</a><a href="#career-ladder-title">Online MCA</a></div>
     <div class="gla-footer-col"><h3>Admissions</h3><a href="#gla-process-title">Admission process</a><a href="#gla-faq-title">FAQs</a><a href="#gla-lead-form">Request information</a></div>
-    <div class="gla-footer-col"><h3>Important information</h3><a href="https://glaonline.com/" target="_blank" rel="noopener noreferrer">Official GLA Online website ↗</a><span>Confirm programme details, eligibility, fees and offer terms with the university.</span></div>
+    <div class="gla-footer-col"><h3>Important information</h3><span>Confirm programme details, eligibility, fees and offer terms with the university.</span></div>
   </div>
   <div class="gla-footer-bottom"><span>© <span id="gla-current-year">2026</span> GLA Online. Information on this page is for enquiry and guidance.</span><a href="#gla-lead-form">Enquire now ↑</a></div>
 </footer>
@@ -758,6 +939,226 @@
 @media(max-width:380px){.gla-footer-main{grid-template-columns:1fr}.gla-footer-brand{grid-column:auto}}
 </style>
 <script>document.getElementById('gla-current-year').textContent = new Date().getFullYear();</script>
+
+<script type="text/javascript">
+var configuration = {
+  widgetId: "366b6e6f336e303830353332",
+  tokenAuth: "590081TUBBrfKL6af884adP1",
+  exposeMethods: true,
+  success: function(){}, failure: function(){}
+};
+(function loadOtpScript(urls){
+  var i=0;
+  function attempt(){
+    var s=document.createElement('script'); s.src=urls[i]; s.async=true;
+    s.onload=function(){ if(typeof window.initSendOTP==='function') window.initSendOTP(configuration); };
+    s.onerror=function(){ i++; if(i<urls.length) attempt(); };
+    document.head.appendChild(s);
+  }
+  attempt();
+})(['https://verify.msg91.com/otp-provider.js','https://verify.phone91.com/otp-provider.js']);
+</script>
+<script id="gla-form-script">
+/* Lead form: syntax validation + mobile OTP (MSG91 widget, lead posted to Apps Script) */
+(function(){
+  var form=document.getElementById('gla-lead-form'); if(!form) return;
+  var $=function(id){return document.getElementById(id);};
+  var el={name:$('gla-name'),mobile:$('gla-mobile'),program:$('gla-program'),qualification:$('gla-qualification'),
+    work_experience:$('gla-experience'),enrolment_timeline:$('gla-timeline'),payment_preference:$('gla-budget')};
+  var order=['name','mobile','program','qualification','work_experience','enrolment_timeline','payment_preference'];
+  var ui={send:$('gla-otp-send'),verified:$('gla-otp-verified'),edit:$('gla-otp-edit'),panel:$('gla-otp-panel'),msg:$('gla-otp-msg'),
+    otp:$('gla-otp'),verify:$('gla-otp-verify'),resend:$('gla-otp-resend'),timer:$('gla-otp-timer'),change:$('gla-otp-change'),
+    submit:$('gla-submit'),alert:$('gla-form-alert'),hp:form.querySelector('.hp')};
+  var st={token:null,verifiedToken:null,verifiedMobile:null,busy:false,cool:0,tick:null,touched:{},pendingSubmit:false};
+  /* Paste the Google Apps Script Web App URL here (see apps-script/README) */
+  var LEAD_ENDPOINT='https://script.google.com/macros/s/AKfycbzWJ7TLb4Dtc-HSKLEpaxBw5RybfZsYwYzFYk7r03fZo8zhPUn-WLEADSERhjX1IJwe/exec';
+  var NAME_RE=/^\p{L}[\p{L}\p{M} .'’-]{1,59}$/u;
+
+  /* ---------- syntax rules ---------- */
+  var rules={
+    name:function(v){v=v.trim().replace(/\s+/g,' ');
+      if(!v) return 'Please enter your full name.';
+      if(!NAME_RE.test(v)||v.replace(/[^\p{L}]/gu,'').length<2) return 'Use letters only, 2–60 characters (e.g. Rahul Sharma).';
+      return '';},
+    mobile:function(v){
+      if(!v) return 'Please enter your mobile number.';
+      if(v.length<10) return 'Mobile number must be 10 digits.';
+      if(!/^[6-9]/.test(v)) return 'Indian mobile numbers start with 6, 7, 8 or 9.';
+      if(/^(\d)\1{9}$/.test(v)) return 'Please enter a valid mobile number.';
+      return '';}
+  };
+  var selMsg={program:'Please choose a programme.',qualification:'Please select your qualification.',work_experience:'Please select your work experience.',
+    enrolment_timeline:'Please tell us when you plan to enrol.',payment_preference:'Please choose a payment preference.'};
+  function check(k){ if(rules[k]) return rules[k](el[k].value); return el[k].value?'':selMsg[k]; }
+
+  function group(k){return el[k].closest('.fgroup');}
+  function paint(k,msg,showValid){
+    var g=group(k), e=$('err-'+k);
+    g.classList.toggle('is-invalid',!!msg);
+    g.classList.toggle('is-valid',!msg&&showValid!==false&&!!el[k].value&&!(k==='mobile'&&!st.verifiedToken));
+    if(e) e.textContent=msg||'';
+    el[k].setAttribute('aria-invalid',msg?'true':'false');
+  }
+  function validate(k,force){ if(!force&&!st.touched[k]) return ''; var m=check(k); paint(k,m); return m; }
+
+  /* ---------- mobile normalisation ---------- */
+  function normMobile(raw){
+    var d=String(raw||'').replace(/\D/g,'');
+    if(d.length>10){ if(/^91\d{10}$/.test(d)) d=d.slice(2); else if(/^0\d{10}$/.test(d)) d=d.slice(1); else d=d.slice(0,10); }
+    return d;
+  }
+  function maskMobile(m){return '+91 '+m.slice(0,2)+'••• ••'+m.slice(-3);}
+
+  /* ---------- OTP ui helpers ---------- */
+  function mobileOk(){return !rules.mobile(el.mobile.value);}
+  function refreshSend(){ ui.send.disabled=!(mobileOk()&&!st.busy&&st.cool<=0&&!st.verifiedToken); }
+  function setMsg(t,err){ui.msg.textContent=t;ui.msg.classList.toggle('is-error',!!err);}
+  function startCooldown(s){
+    st.cool=s; clearInterval(st.tick);
+    function paintT(){ ui.timer.textContent=st.cool; ui.resend.disabled=st.cool>0; if(st.cool<=0){ui.resend.innerHTML='Resend OTP';} else {ui.resend.innerHTML='Resend OTP in <b id="gla-otp-timer">'+st.cool+'</b>s'; ui.timer=$('gla-otp-timer');} refreshSend(); }
+    paintT();
+    st.tick=setInterval(function(){st.cool--; paintT(); if(st.cool<=0) clearInterval(st.tick);},1000);
+  }
+  /* MSG91 OTP widget (exposeMethods mode: our UI, MSG91 sends + verifies) */
+  function wErr(e,d){ if(!e) return d; if(typeof e==='string') return e; return e.message||e.error||d; }
+  function wSend(id){
+    return new Promise(function(res){
+      if(typeof window.sendOtp!=='function') return res({ok:false,error:'OTP service is still loading. Please try again in a moment.'});
+      try{ window.sendOtp(id,function(d){res({ok:true,d:d});},function(e){res({ok:false,error:wErr(e,'Could not send OTP. Please try again.')});}); }
+      catch(x){ res({ok:false,error:'Could not send OTP. Please try again.'}); }
+    });
+  }
+  function wVerify(code){
+    return new Promise(function(res){
+      if(typeof window.verifyOtp!=='function') return res({ok:false,error:'OTP service is still loading. Please try again.'});
+      try{ window.verifyOtp(code,function(d){ var t=d&&(d.message||d.token); t?res({ok:true,token:t}):res({ok:false,error:'Incorrect OTP.'}); },
+        function(e){res({ok:false,error:wErr(e,'Incorrect OTP. Please check and try again.')});}); }
+      catch(x){ res({ok:false,error:'Could not verify. Please try again.'}); }
+    });
+  }
+  function postLead(body){
+    if(/^PASTE_/.test(LEAD_ENDPOINT)) return Promise.resolve({ok:false,error:'Form is not connected yet. Please call us.'});
+    return fetch(LEAD_ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)})
+      .then(function(){return {ok:true};}).catch(function(){return {ok:false,error:'Network problem. Please check your connection and try again.'};});
+  }
+  function api(path,body){
+    return fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+      .then(function(r){return r.json().catch(function(){return {ok:false,error:'Unexpected response from server.'};}).then(function(j){j._s=r.status;return j;});})
+      .catch(function(){return {ok:false,error:'Network problem. Please check your connection and try again.'};});
+  }
+  function resetVerification(){
+    st.token=null; st.verifiedToken=null; st.verifiedMobile=null;
+    ui.verified.hidden=true; ui.send.hidden=false; el.mobile.readOnly=false; group('mobile').classList.remove('is-verified');
+    refreshSend();
+  }
+  function closePanel(){ui.panel.hidden=true; ui.otp.value=''; clearInterval(st.tick);}
+
+  function sendOtp(){
+    var m=el.mobile.value; st.touched.mobile=true;
+    var err=rules.mobile(m); if(err){paint('mobile',err);el.mobile.focus();return Promise.resolve(false);}
+    st.busy=true; ui.send.textContent='Sending…'; refreshSend(); ui.resend.disabled=true;
+    return wSend('91'+m).then(function(j){
+      st.busy=false; ui.send.textContent='Send OTP';
+      if(j.ok){
+        st.token=true; ui.panel.hidden=false; ui.otp.value='';
+        setMsg('OTP sent to '+maskMobile(m)+'. It is valid for 5 minutes.');
+        paint('mobile',''); startCooldown(30); setTimeout(function(){ui.otp.focus();},60); refreshSend(); return true;
+      }
+      refreshSend();
+      paint('mobile',j.error||'Could not send OTP. Please try again.'); return false;
+    });
+  }
+  function verifyOtp(){
+    var code=ui.otp.value.trim();
+    if(!/^\d{6}$/.test(code)){setMsg('Enter the 6-digit OTP.',true);ui.otp.focus();return;}
+    if(!st.token){setMsg('Please request an OTP first.',true);return;}
+    ui.verify.disabled=true; ui.verify.textContent='Checking…';
+    wVerify(code).then(function(r){ return r.ok ? {ok:true,verifiedToken:r.token} : r; }).then(function(j){
+      ui.verify.disabled=false; ui.verify.textContent='Verify';
+      if(j.ok){
+        st.verifiedToken=j.verifiedToken; st.verifiedMobile=el.mobile.value; st.token=null;
+        closePanel(); ui.send.hidden=true; ui.verified.hidden=false; el.mobile.readOnly=true;
+        group('mobile').classList.add('is-verified'); paint('mobile','',false); setAlert('');
+        if(st.pendingSubmit){st.pendingSubmit=false; form.requestSubmit?form.requestSubmit():submitForm();}
+      } else { setMsg(j.error||'Incorrect OTP.',true); ui.otp.select(); if(j._s===429){st.token=null;} }
+    });
+  }
+  function setAlert(t){ui.alert.hidden=!t; ui.alert.textContent=t||'';}
+
+  /* ---------- events ---------- */
+  order.forEach(function(k){
+    var ev=(el[k].tagName==='SELECT')?'change':'input';
+    el[k].addEventListener(ev,function(){
+      if(k==='mobile'){
+        var n=normMobile(el.mobile.value); if(el.mobile.value!==n) el.mobile.value=n;
+        if(st.verifiedToken&&n!==st.verifiedMobile) resetVerification();
+        refreshSend();
+        if(n.length===10) st.touched.mobile=true;
+      }
+      if(ev==='change') st.touched[k]=true;
+      if(st.touched[k]||group(k).classList.contains('is-invalid')) validate(k,true);
+    });
+    el[k].addEventListener('blur',function(){ if(!el[k].value&&k!=='mobile'&&!st.touched[k]) return; st.touched[k]=true; validate(k,true); });
+  });
+  ui.send.addEventListener('click',sendOtp);
+  ui.resend.addEventListener('click',function(){ if(st.cool<=0) sendOtp(); });
+  ui.verify.addEventListener('click',verifyOtp);
+  ui.otp.addEventListener('input',function(){
+    ui.otp.value=ui.otp.value.replace(/\D/g,'').slice(0,6); setMsg(ui.msg.textContent.replace(/^$/,''),false);
+    if(ui.otp.value.length===6) verifyOtp();
+  });
+  ui.otp.addEventListener('keydown',function(e){ if(e.key==='Enter'){e.preventDefault();verifyOtp();} });
+  ui.change.addEventListener('click',function(){closePanel();st.token=null;el.mobile.focus();el.mobile.select();});
+  ui.edit.addEventListener('click',function(){resetVerification();paint('mobile','',false);el.mobile.focus();el.mobile.select();});
+  el.mobile.addEventListener('keydown',function(e){ if(e.key==='Enter'&&mobileOk()&&!st.verifiedToken&&ui.panel.hidden){e.preventDefault();sendOtp();} });
+
+  /* ---------- tracking params ---------- */
+  function utm(){
+    var o={}, keys=['utm_source','utm_medium','utm_campaign','utm_term','utm_content'];
+    try{ var q=new URLSearchParams(location.search), found=false;
+      keys.forEach(function(k){ if(q.get(k)){o[k]=q.get(k);found=true;} });
+      if(found) sessionStorage.setItem('gla_utm',JSON.stringify(o)); else { var s=sessionStorage.getItem('gla_utm'); if(s) o=JSON.parse(s); }
+    }catch(e){}
+    return o;
+  }
+
+  /* ---------- submit ---------- */
+  function submitForm(){
+    setAlert('');
+    var firstBad=null;
+    order.forEach(function(k){ st.touched[k]=true; var m=check(k); paint(k,m); if(m&&!firstBad) firstBad=k; });
+    if(firstBad){ form.classList.remove('shake'); void form.offsetWidth; form.classList.add('shake'); el[firstBad].focus(); return; }
+    if(!st.verifiedToken){
+      st.pendingSubmit=true;
+      if(ui.panel.hidden && !st.busy){ sendOtp().then(function(ok){ if(!ok) st.pendingSubmit=false; else setMsg('We have sent an OTP to '+maskMobile(el.mobile.value)+'. Enter it to finish.'); }); }
+      else { setMsg('Enter the OTP sent to '+maskMobile(el.mobile.value)+' to finish.',true); ui.otp.focus(); }
+      return;
+    }
+    ui.submit.classList.add('is-loading'); ui.submit.disabled=true;
+    var body={name:el.name.value.trim().replace(/\s+/g,' '),mobile:'+91'+el.mobile.value,program:el.program.value,qualification:el.qualification.value,
+      work_experience:el.work_experience.value,enrolment_timeline:el.enrolment_timeline.value,payment_preference:el.payment_preference.value,
+      lp:'gla-online',device:(/Mobi|Android|iPhone/i.test(navigator.userAgent)?'Mobile':'Desktop'),accessToken:st.verifiedToken,company_website:ui.hp?ui.hp.value:'',page_url:location.href.slice(0,300),referrer:(document.referrer||'').slice(0,300)};
+    var u=utm(); Object.keys(u).forEach(function(k){body[k]=u[k];});
+    postLead(body).then(function(j){
+      ui.submit.classList.remove('is-loading'); ui.submit.disabled=false;
+      if(j.ok){
+        var first=body.name.split(' ')[0];
+        $('gla-success-title').textContent='Thank you, '+first+'!';
+        $('gla-success-text').textContent='Your enquiry has been received. A counsellor will contact you on '+maskMobile(body.mobile)+'.';
+        form.classList.add('is-done'); $('gla-form-success').hidden=false;
+        try{ window.dataLayer=window.dataLayer||[]; window.dataLayer.push({event:'lead_submit_verified',program:body.program}); }catch(e){}
+        try{ sessionStorage.setItem('gla_lead_done','1'); sessionStorage.setItem('gla_lead_name',first); }catch(e){}
+        setTimeout(function(){ location.assign('thank-you.html'); },350);
+      } else {
+        if(j._s===403){ resetVerification(); }
+        setAlert(j.error||'Something went wrong. Please try again.');
+      }
+    });
+  }
+  form.addEventListener('submit',function(e){e.preventDefault();submitForm();});
+  refreshSend();
+})();
+</script>
 
 </body>
 </html>
