@@ -78,7 +78,8 @@ src="https://www.facebook.com/tr?id=1878608889840802&ev=PageView&noscript=1"
     /* count the conversion once, only for people who just submitted the form */
     if(sessionStorage.getItem('gla_lead_done')==='1'){
       sessionStorage.removeItem('gla_lead_done');
-      if(window.fbq) window.fbq('track','Lead');
+      var eid=sessionStorage.getItem('gla_lead_id'); sessionStorage.removeItem('gla_lead_id');
+      if(window.fbq){ if(eid) window.fbq('track','Lead',{content_name:'GLA Online MBA & MCA'},{eventID:eid}); else window.fbq('track','Lead',{content_name:'GLA Online MBA & MCA'}); }
       window.dataLayer=window.dataLayer||[]; window.dataLayer.push({event:'lead_thankyou_view'});
     }
   }catch(e){}

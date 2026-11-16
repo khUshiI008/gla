@@ -1149,7 +1149,7 @@ var configuration = {
         $('gla-success-text').textContent='Your enquiry has been received. A counsellor will contact you on '+maskMobile(body.mobile)+'.';
         form.classList.add('is-done'); $('gla-form-success').hidden=false;
         try{ window.dataLayer=window.dataLayer||[]; window.dataLayer.push({event:'lead_submit_verified',program:body.program}); }catch(e){}
-        try{ sessionStorage.setItem('gla_lead_done','1'); sessionStorage.setItem('gla_lead_name',first); }catch(e){}
+        try{ sessionStorage.setItem('gla_lead_done','1'); sessionStorage.setItem('gla_lead_id','lead_'+Date.now()+'_'+Math.random().toString(36).slice(2,10)); sessionStorage.setItem('gla_lead_name',first); }catch(e){}
         setTimeout(function(){ location.assign('thank-you.html'); },350);
       } else {
         if(j._s===403){ resetVerification(); }
