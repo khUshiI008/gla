@@ -259,23 +259,14 @@ select.field:invalid{color:#7b8a80}
 @media (prefers-reduced-motion:reduce){.floating-form,.form-badge i,.floating-form .form-submit::after,.otp-panel,.success-tick{animation:none!important}}
 </style>
 
-<!-- Meta Pixel Code -->
+<!-- Google Tag Manager -->
+<script async src="https://www.googletagmanager.com/gtm.js?id=GTM-5VCXB2SF"></script>
 <script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '1878608889840802');
-fbq('track', 'PageView');
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 </script>
-<noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=1878608889840802&ev=PageView&noscript=1"
-/></noscript>
-<!-- End Meta Pixel Code -->
+<!-- End Google Tag Manager -->
 </head>
 <body>
 <section class="gla-hero" aria-labelledby="gla-hero-title">
@@ -969,7 +960,7 @@ var configuration = {
   var ui={send:$('gla-otp-send'),verified:$('gla-otp-verified'),edit:$('gla-otp-edit'),panel:$('gla-otp-panel'),msg:$('gla-otp-msg'),
     otp:$('gla-otp'),verify:$('gla-otp-verify'),resend:$('gla-otp-resend'),timer:$('gla-otp-timer'),change:$('gla-otp-change'),
     submit:$('gla-submit'),alert:$('gla-form-alert'),hp:form.querySelector('.hp')};
-  var st={token:null,verifiedToken:null,verifiedMobile:null,busy:false,cool:0,tick:null,touched:{},pendingSubmit:false};
+  var st={submitting:false,leadId:null,token:null,verifiedToken:null,verifiedMobile:null,busy:false,cool:0,tick:null,touched:{},pendingSubmit:false};
   /* Paste the Google Apps Script Web App URL here (see apps-script/README) */
   var LEAD_ENDPOINT='https://script.google.com/macros/s/AKfycbzWJ7TLb4Dtc-HSKLEpaxBw5RybfZsYwYzFYk7r03fZo8zhPUn-WLEADSERhjX1IJwe/exec';
   /* Must match 'OTP length' in the MSG91 widget settings (MSG91 default = 4). If you change it there, change it here. */
@@ -1038,10 +1029,28 @@ var configuration = {
       catch(x){ res({ok:false,error:'Could not verify. Please try again.'}); }
     });
   }
+  var DUP_MSG='This mobile number is already registered with us. Our counsellor will contact you shortly.';
+  /* ask the sheet script whether this number was already submitted (fails open if unreachable) */
+  function checkDup(m){
+    if(/^PASTE_/.test(LEAD_ENDPOINT)) return Promise.resolve(false);
+    return fetch(LEAD_ENDPOINT+'?check='+encodeURIComponent(m)+'&lp=gla-online')
+      .then(function(r){return r.json();}).then(function(j){return !!(j&&j.duplicate);}).catch(function(){return false;});
+  }
   function postLead(body){
     if(/^PASTE_/.test(LEAD_ENDPOINT)) return Promise.resolve({ok:false,error:'Form is not connected yet. Please call us.'});
-    return fetch(LEAD_ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)})
-      .then(function(){return {ok:true};}).catch(function(){return {ok:false,error:'Network problem. Please check your connection and try again.'};});
+    var opts={method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)};
+    var timeout=new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'));},10000);});
+    return Promise.race([fetch(LEAD_ENDPOINT,opts),timeout]).then(function(r){
+      return r.json().then(function(j){
+        if(j&&j.duplicate) return {ok:false,duplicate:true,error:DUP_MSG};
+        if(j&&j.ok===false) return {ok:false,error:j.error||'Something went wrong. Please try again.'};
+        return {ok:true};
+      },function(){return {ok:true};});
+    },function(){
+      /* response unreadable or slow: re-send once without reading it (the sheet script ignores repeats) */
+      return fetch(LEAD_ENDPOINT,{method:'POST',mode:'no-cors',headers:opts.headers,body:opts.body})
+        .then(function(){return {ok:true};},function(){return {ok:false,error:'Network problem. Please check your connection and try again.'};});
+    });
   }
   function api(path,body){
     return fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
@@ -1059,7 +1068,7 @@ var configuration = {
     var m=el.mobile.value; st.touched.mobile=true;
     var err=rules.mobile(m); if(err){paint('mobile',err);el.mobile.focus();return Promise.resolve(false);}
     st.busy=true; ui.send.textContent='Sending…'; refreshSend(); ui.resend.disabled=true;
-    return wSend('91'+m).then(function(j){
+    return checkDup(m).then(function(d){ return d?{ok:false,error:DUP_MSG}:wSend('91'+m); }).then(function(j){
       st.busy=false; ui.send.textContent='Send OTP';
       if(j.ok){
         st.token=true; ui.panel.hidden=false; ui.otp.value='';
@@ -1136,20 +1145,24 @@ var configuration = {
       else { setMsg('Enter the OTP sent to '+maskMobile(el.mobile.value)+' to finish.',true); ui.otp.focus(); }
       return;
     }
+    if(st.submitting) return;               /* one submission at a time */
+    st.submitting=true;
+    if(!st.leadId) st.leadId='lead_'+Date.now()+'_'+Math.random().toString(36).slice(2,10);
     ui.submit.classList.add('is-loading'); ui.submit.disabled=true;
-    var body={name:el.name.value.trim().replace(/\s+/g,' '),mobile:'+91'+el.mobile.value,program:el.program.value,qualification:el.qualification.value,
+    var body={lead_id:st.leadId,name:el.name.value.trim().replace(/\s+/g,' '),mobile:'+91'+el.mobile.value,program:el.program.value,qualification:el.qualification.value,
       work_experience:el.work_experience.value,enrolment_timeline:el.enrolment_timeline.value,payment_preference:el.payment_preference.value,
       lp:'gla-online',device:(/Mobi|Android|iPhone/i.test(navigator.userAgent)?'Mobile':'Desktop'),accessToken:st.verifiedToken,company_website:ui.hp?ui.hp.value:'',page_url:location.href.slice(0,300),referrer:(document.referrer||'').slice(0,300)};
     var u=utm(); Object.keys(u).forEach(function(k){body[k]=u[k];});
     postLead(body).then(function(j){
-      ui.submit.classList.remove('is-loading'); ui.submit.disabled=false;
+      ui.submit.classList.remove('is-loading');
+      if(!j.ok){ ui.submit.disabled=false; st.submitting=false; }
       if(j.ok){
         var first=body.name.split(' ')[0];
         $('gla-success-title').textContent='Thank you, '+first+'!';
         $('gla-success-text').textContent='Your enquiry has been received. A counsellor will contact you on '+maskMobile(body.mobile)+'.';
         form.classList.add('is-done'); $('gla-form-success').hidden=false;
         try{ window.dataLayer=window.dataLayer||[]; window.dataLayer.push({event:'lead_submit_verified',program:body.program}); }catch(e){}
-        try{ sessionStorage.setItem('gla_lead_done','1'); sessionStorage.setItem('gla_lead_id','lead_'+Date.now()+'_'+Math.random().toString(36).slice(2,10)); sessionStorage.setItem('gla_lead_name',first); }catch(e){}
+        try{ sessionStorage.setItem('gla_lead_done','1'); sessionStorage.setItem('gla_lead_id',st.leadId); sessionStorage.setItem('gla_lead_name',first); }catch(e){}
         setTimeout(function(){ location.assign('thank-you.html'); },350);
       } else {
         if(j._s===403){ resetVerification(); }

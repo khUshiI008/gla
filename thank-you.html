@@ -35,23 +35,14 @@ h1{margin:0 0 8px;font-family:Georgia,serif;font-size:clamp(26px,5vw,34px);line-
 footer{padding:0 18px 22px;text-align:center;color:rgba(255,255,255,.65);font-size:12px}
 @media(max-width:480px){.card{padding:32px 18px 24px;border-radius:18px}}
 </style>
-<!-- Meta Pixel Code -->
+<!-- Google Tag Manager -->
+<script async src="https://www.googletagmanager.com/gtm.js?id=GTM-5VCXB2SF"></script>
 <script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '1878608889840802');
-fbq('track', 'PageView');
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 </script>
-<noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=1878608889840802&ev=PageView&noscript=1"
-/></noscript>
-<!-- End Meta Pixel Code -->
+<!-- End Google Tag Manager -->
 </head>
 <body>
 <header class="nav"><div class="mark" aria-hidden="true">GLA</div><div class="bname">GLA<small>University</small></div></header>
@@ -79,8 +70,7 @@ src="https://www.facebook.com/tr?id=1878608889840802&ev=PageView&noscript=1"
     if(sessionStorage.getItem('gla_lead_done')==='1'){
       sessionStorage.removeItem('gla_lead_done');
       var eid=sessionStorage.getItem('gla_lead_id'); sessionStorage.removeItem('gla_lead_id');
-      if(window.fbq){ if(eid) window.fbq('track','Lead',{content_name:'GLA Online MBA & MCA'},{eventID:eid}); else window.fbq('track','Lead',{content_name:'GLA Online MBA & MCA'}); }
-      window.dataLayer=window.dataLayer||[]; window.dataLayer.push({event:'lead_thankyou_view'});
+      window.dataLayer=window.dataLayer||[]; window.dataLayer.push({event:'lead_thankyou_view',lp:'gla-online',event_id:eid||''});
     }
   }catch(e){}
 })();
